@@ -3,6 +3,7 @@
 \alias{run_elastic_net}
 \alias{run_boruta}
 \alias{run_svm_rfe}
+\alias{run_msvm_rfe}
 \alias{run_rf}
 \alias{run_xgboost}
 \alias{run_ga}
@@ -15,6 +16,8 @@ run_elastic_net(data, group_col = "group", feature_cols = NULL, ...)
 run_boruta(data, group_col = "group", feature_cols = NULL, ...)
 
 run_svm_rfe(data, group_col = "group", feature_cols = NULL, ...)
+
+run_msvm_rfe(data, group_col = "group", feature_cols = NULL, ...)
 
 run_rf(data, group_col = "group", feature_cols = NULL, ...)
 
@@ -41,7 +44,11 @@ you want full control over one algorithm before combining results manually.
 is LASSO, \code{alpha = 0} is ridge, and values between 0 and 1 are elastic net.
 \code{run_elastic_net()} is a convenience wrapper around \code{run_lasso()} with
 default \code{alpha = 0.5}. \code{run_boruta()} uses \pkg{Boruta}.
-\code{run_svm_rfe()} uses a linear \pkg{e1071} SVM-RFE implementation.
+\code{run_svm_rfe()} uses a lightweight linear \pkg{e1071} SVM-RFE
+implementation. \code{run_msvm_rfe()} implements the older multiple SVM-RFE
+workflow with fold-specific rankings, \code{k} internal ranking folds,
+\code{halve_above} feature halving, and an optional tuned SVM feature-count
+sweep.
 \code{run_rf()} uses \pkg{randomForest}. \code{run_xgboost()} uses
 \pkg{xgboost}. \code{run_ga()} uses \pkg{caret} genetic algorithm feature
 selection with random forest fitness.

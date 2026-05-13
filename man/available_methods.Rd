@@ -11,7 +11,9 @@ A character vector of method names accepted by \code{run_feature_selection()}.
 Returns the feature-selection method identifiers supported by IKUNML.
 The returned methods include \code{"ga"} for genetic algorithm selection and
 \code{"elastic_net"} as a clearer alias for \pkg{glmnet} models with
-\code{0 < alpha < 1}.
+\code{0 < alpha < 1}. It also includes \code{"msvm_rfe"}, a package-native
+implementation of the old multiple SVM-RFE workflow often sourced from
+\code{msvmRFE.R}.
 }
 \examples{
 available_methods()

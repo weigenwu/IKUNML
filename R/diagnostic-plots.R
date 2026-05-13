@@ -265,7 +265,7 @@ write_ikun_plots <- function(result,
       .plot_lasso_diagnostics(method_result, method_dir)
     } else if (identical(method, "boruta")) {
       .plot_boruta_diagnostics(method_result, method_dir)
-    } else if (identical(method, "svm_rfe")) {
+    } else if (method %in% c("svm_rfe", "msvm_rfe")) {
       .plot_svm_diagnostics(method_result, method_dir, top_n = top_n)
     } else if (identical(method, "rf")) {
       .plot_rf_diagnostics(method_result, method_dir, top_n = top_n)

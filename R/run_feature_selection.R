@@ -24,6 +24,7 @@ run_feature_selection <- function(data,
     elastic_net = run_elastic_net,
     boruta = run_boruta,
     svm_rfe = run_svm_rfe,
+    msvm_rfe = run_msvm_rfe,
     rf = run_rf,
     xgboost = run_xgboost,
     ga = run_ga

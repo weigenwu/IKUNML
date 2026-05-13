@@ -1,4 +1,4 @@
-.ikunml_methods <- c("lasso", "elastic_net", "boruta", "svm_rfe", "rf", "xgboost", "ga")
+.ikunml_methods <- c("lasso", "elastic_net", "boruta", "svm_rfe", "msvm_rfe", "rf", "xgboost", "ga")
 
 .method_aliases <- c(
   lasso = "lasso",
@@ -10,6 +10,9 @@
   svm = "svm_rfe",
   svm_rfe = "svm_rfe",
   svmrfe = "svm_rfe",
+  msvm = "msvm_rfe",
+  msvm_rfe = "msvm_rfe",
+  msvmrfe = "msvm_rfe",
   rf = "rf",
   random_forest = "rf",
   randomforest = "rf",

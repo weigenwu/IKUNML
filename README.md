@@ -8,6 +8,7 @@ IKUNML 是一个把常见机器学习特征筛选流程封装起来的 R 包，�
 - `elastic_net`: 基于 `glmnet`，默认 `alpha = 0.5`
 - `boruta`: Boruta 随机森林重要性筛选
 - `svm_rfe`: 线性 SVM-RFE
+- `msvm_rfe`: 更贴近旧 `msvmRFE.R` 脚本的 multiple SVM-RFE
 - `rf`: 随机森林重要性排序 + 交叉验证确定特征数量
 - `xgboost`: XGBoost 重要性排序 + 交叉验证确定特征数量
 - `ga`: caret 遗传算法特征筛选
@@ -171,6 +172,7 @@ res <- run_feature_selection(
   methods = c("elastic_net", "boruta", "svm_rfe", "rf", "xgboost", "ga"),
   method_params = list(
     elastic_net = list(alpha = 0.5),
+    svm_rfe = list(max_features = 200, halve_above = 50),
     ga = list(iters = 100, popSize = 50, nfolds = 10, ntree = 500, parallel = TRUE, cores = 8)
   ),
   output_dir = "IKUNML_results",
@@ -182,6 +184,41 @@ res <- run_feature_selection(
 `write_plots = TRUE` 会导出类似旧脚本里的 PDF 诊断图，例如 LASSO/elastic net 的 CV 曲线、RF/XGBoost 的交叉验证准确率曲线、重要性条形图、Boruta 重要性图和 GA 进化曲线。
 
 `save_models = TRUE` 会把每种方法的结果对象和模型对象保存为 RDS。GA 比较耗时，建议正式跑 GA 时打开这个选项，后续可以直接 `readRDS()` 读取结果。
+
+## 旧版 msvmRFE.R 风格
+
+如果你想尽量贴近旧脚本里 `source("msvmRFE.R")` 后运行的流程，用 `msvm_rfe`：
+
+```r
+msvm_res <- run_msvm_rfe(
+  data,
+  group_col = "group",
+  k = 10,
+  halve_above = 50,
+  nfolds = 5,
+  max_features = 200,
+  rank_cost = 10,
+  tune = TRUE,
+  tune_ranges = list(gamma = 2^(-12:0), cost = 2^(-6:6)),
+  tolerance = 0,
+  prefer = "largest"
+)
+```
+
+也可以放进统一入口：
+
+```r
+res <- run_feature_selection(
+  data,
+  group_col = "group",
+  methods = c("msvm_rfe", "rf", "xgboost"),
+  method_params = list(
+    msvm_rfe = list(k = 10, halve_above = 50, max_features = 200)
+  )
+)
+```
+
+`svm_rfe` 是轻量线性版本；`msvm_rfe` 更像你原来的脚本，会更慢，但结果更接近旧流程。
 
 ## 取交集和汇总命中次数
 

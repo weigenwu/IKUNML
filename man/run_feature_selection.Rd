@@ -15,7 +15,8 @@ run_feature_selection(data, group_col = "group", feature_cols = NULL,
 \item{methods}{Methods to run. Use \code{"all"} to request every supported method.
 Use \code{"lasso"} for the default \code{alpha = 1} \pkg{glmnet} model,
 \code{"elastic_net"} for the same backend with default \code{alpha = 0.5}, and
-\code{"ga"} for genetic algorithm feature selection.}
+\code{"ga"} for genetic algorithm feature selection. Use \code{"msvm_rfe"} for
+the older multiple SVM-RFE style workflow.}
 \item{method_params}{Named list of method-specific parameter lists.}
 \item{positive_class}{Optional positive class label for binary methods.}
 \item{seed}{Random seed passed to methods unless overridden in \code{method_params}.}
@@ -57,6 +58,15 @@ enet_ga <- run_feature_selection(
   output_dir = "IKUNML_results",
   write_plots = TRUE,
   save_models = TRUE
+)
+
+msvm <- run_feature_selection(
+  data,
+  group_col = "group",
+  methods = "msvm_rfe",
+  method_params = list(
+    msvm_rfe = list(k = 10, halve_above = 50, max_features = 200)
+  )
 )
 }
 }
