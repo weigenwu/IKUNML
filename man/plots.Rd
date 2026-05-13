@@ -32,7 +32,7 @@ The plotting data or grob object, invisibly.
 Draw UpSet or Venn diagrams for selected feature overlaps. Use UpSet plots for
 six or more methods.
 \code{write_ikun_plots()} writes method-specific diagnostic plots such as
-glmnet CV curves, SVM-RFE/mSVM-RFE error and accuracy curves, RF/XGBoost CV
-accuracy curves, feature-importance bar plots, Boruta importance plots, and GA
-evolution curves.
+glmnet CV curves, SVM-RFE/mSVM-RFE error and accuracy curves, RF/caret
+RFE/GBM/rpart/XGBoost CV accuracy curves, feature-importance bar plots, Boruta
+importance plots, and GA evolution curves.
 }

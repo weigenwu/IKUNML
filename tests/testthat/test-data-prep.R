@@ -42,9 +42,12 @@ test_that("feature hit summary counts selected features", {
 test_that("method aliases include elastic net and GA", {
   expect_true("elastic_net" %in% available_methods())
   expect_true("msvm_rfe" %in% available_methods())
+  expect_true("caret_rfe" %in% available_methods())
+  expect_true("gbm" %in% available_methods())
+  expect_true("rpart" %in% available_methods())
   expect_true("ga" %in% available_methods())
   expect_equal(
-    IKUNML:::.normalize_methods(c("enet", "msvmrfe", "genetic_algorithm")),
-    c("elastic_net", "msvm_rfe", "ga")
+    IKUNML:::.normalize_methods(c("enet", "msvmrfe", "rfe", "boosting", "decision_tree", "genetic_algorithm")),
+    c("elastic_net", "msvm_rfe", "caret_rfe", "gbm", "rpart", "ga")
   )
 })

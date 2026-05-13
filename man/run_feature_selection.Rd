@@ -16,7 +16,8 @@ run_feature_selection(data, group_col = "group", feature_cols = NULL,
 Use \code{"lasso"} for the default \code{alpha = 1} \pkg{glmnet} model,
 \code{"elastic_net"} for the same backend with default \code{alpha = 0.5}, and
 \code{"ga"} for genetic algorithm feature selection. Use \code{"msvm_rfe"} for
-the older multiple SVM-RFE style workflow.}
+the older multiple SVM-RFE style workflow. Additional methods include
+\code{"caret_rfe"}, \code{"gbm"}, and \code{"rpart"}.}
 \item{method_params}{Named list of method-specific parameter lists.}
 \item{positive_class}{Optional positive class label for binary methods.}
 \item{seed}{Random seed passed to methods unless overridden in \code{method_params}.}
@@ -66,6 +67,17 @@ msvm <- run_feature_selection(
   methods = "msvm_rfe",
   method_params = list(
     msvm_rfe = list(k = 10, halve_above = 50, max_features = 200)
+  )
+)
+
+more_ml <- run_feature_selection(
+  data,
+  group_col = "group",
+  methods = c("caret_rfe", "gbm", "rpart"),
+  method_params = list(
+    caret_rfe = list(sizes = c(5, 10, 20, 50), number = 5),
+    gbm = list(n.trees = 500, cv_n.trees = 100),
+    rpart = list(cp = 0.001)
   )
 )
 }

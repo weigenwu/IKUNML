@@ -13,7 +13,8 @@ The returned methods include \code{"ga"} for genetic algorithm selection and
 \code{"elastic_net"} as a clearer alias for \pkg{glmnet} models with
 \code{0 < alpha < 1}. It also includes \code{"msvm_rfe"}, a package-native
 implementation of the old multiple SVM-RFE workflow often sourced from
-\code{msvmRFE.R}.
+\code{msvmRFE.R}, plus \code{"caret_rfe"}, \code{"gbm"}, and \code{"rpart"}
+as additional machine-learning feature-selection methods.
 }
 \examples{
 available_methods()

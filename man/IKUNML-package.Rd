@@ -10,5 +10,6 @@ parameter control, result export, and overlap summaries.
 }
 \details{
 Supported methods include LASSO, elastic net, Boruta, SVM-RFE, mSVM-RFE,
-random forest, XGBoost, and caret genetic algorithm feature selection.
+random forest, caret RFE, GBM, rpart, XGBoost, and caret genetic algorithm
+feature selection.
 }

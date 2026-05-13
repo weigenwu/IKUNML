@@ -5,6 +5,9 @@
 \alias{run_svm_rfe}
 \alias{run_msvm_rfe}
 \alias{run_rf}
+\alias{run_caret_rfe}
+\alias{run_gbm}
+\alias{run_rpart}
 \alias{run_xgboost}
 \alias{run_ga}
 \title{Run Individual Feature Selection Methods}
@@ -20,6 +23,12 @@ run_svm_rfe(data, group_col = "group", feature_cols = NULL, ...)
 run_msvm_rfe(data, group_col = "group", feature_cols = NULL, ...)
 
 run_rf(data, group_col = "group", feature_cols = NULL, ...)
+
+run_caret_rfe(data, group_col = "group", feature_cols = NULL, ...)
+
+run_gbm(data, group_col = "group", feature_cols = NULL, ...)
+
+run_rpart(data, group_col = "group", feature_cols = NULL, ...)
 
 run_xgboost(data, group_col = "group", feature_cols = NULL, ...)
 
@@ -49,7 +58,9 @@ implementation. \code{run_msvm_rfe()} implements the older multiple SVM-RFE
 workflow with fold-specific rankings, \code{k} internal ranking folds,
 \code{halve_above} feature halving, and an optional tuned SVM feature-count
 sweep.
-\code{run_rf()} uses \pkg{randomForest}. \code{run_xgboost()} uses
-\pkg{xgboost}. \code{run_ga()} uses \pkg{caret} genetic algorithm feature
-selection with random forest fitness.
+\code{run_rf()} uses \pkg{randomForest}. \code{run_caret_rfe()} uses
+\pkg{caret}'s RFE framework, defaulting to random forest functions.
+\code{run_gbm()} uses \pkg{gbm}. \code{run_rpart()} uses a classification tree
+from \pkg{rpart}. \code{run_xgboost()} uses \pkg{xgboost}. \code{run_ga()} uses
+\pkg{caret} genetic algorithm feature selection with random forest fitness.
 }

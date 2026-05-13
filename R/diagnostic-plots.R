@@ -237,6 +237,43 @@
   }
 }
 
+.plot_importance_cv_diagnostics <- function(method_result,
+                                            method_dir,
+                                            top_n,
+                                            label) {
+  if (!is.null(method_result$cv_metrics) &&
+      all(c("n_features", "accuracy") %in% names(method_result$cv_metrics))) {
+    .write_pdf_plot(
+      file.path(method_dir, paste0(method_result$method, "_cv_accuracy.pdf")),
+      8,
+      5,
+      function() {
+        .plot_metric_curve(
+          method_result$cv_metrics,
+          "accuracy",
+          paste(label, "Feature Selection"),
+          "CV Accuracy"
+        )
+        if (!is.null(method_result$optimal_count)) {
+          graphics::abline(v = method_result$optimal_count, col = "#E64B35", lty = 2, lwd = 2)
+        }
+      }
+    )
+  }
+  .write_pdf_plot(
+    file.path(method_dir, paste0(method_result$method, "_top_features.pdf")),
+    9,
+    7,
+    function() .plot_top_bar(
+      method_result$importance,
+      value_col = "importance",
+      top_n = top_n,
+      title = paste("Top Features by", label),
+      ylab = "Importance"
+    )
+  )
+}
+
 write_ikun_plots <- function(result,
                              output_dir = "IKUNML_results",
                              methods = NULL,
@@ -269,6 +306,12 @@ write_ikun_plots <- function(result,
       .plot_svm_diagnostics(method_result, method_dir, top_n = top_n)
     } else if (identical(method, "rf")) {
       .plot_rf_diagnostics(method_result, method_dir, top_n = top_n)
+    } else if (identical(method, "caret_rfe")) {
+      .plot_importance_cv_diagnostics(method_result, method_dir, top_n = top_n, label = "caret RFE")
+    } else if (identical(method, "gbm")) {
+      .plot_importance_cv_diagnostics(method_result, method_dir, top_n = top_n, label = "GBM")
+    } else if (identical(method, "rpart")) {
+      .plot_importance_cv_diagnostics(method_result, method_dir, top_n = top_n, label = "rpart")
     } else if (identical(method, "xgboost")) {
       .plot_xgboost_diagnostics(method_result, method_dir, top_n = top_n)
     } else if (identical(method, "ga")) {

@@ -26,6 +26,9 @@ run_feature_selection <- function(data,
     svm_rfe = run_svm_rfe,
     msvm_rfe = run_msvm_rfe,
     rf = run_rf,
+    caret_rfe = run_caret_rfe,
+    gbm = run_gbm,
+    rpart = run_rpart,
     xgboost = run_xgboost,
     ga = run_ga
   )

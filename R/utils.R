@@ -1,4 +1,7 @@
-.ikunml_methods <- c("lasso", "elastic_net", "boruta", "svm_rfe", "msvm_rfe", "rf", "xgboost", "ga")
+.ikunml_methods <- c(
+  "lasso", "elastic_net", "boruta", "svm_rfe", "msvm_rfe",
+  "rf", "caret_rfe", "gbm", "rpart", "xgboost", "ga"
+)
 
 .method_aliases <- c(
   lasso = "lasso",
@@ -16,6 +19,17 @@
   rf = "rf",
   random_forest = "rf",
   randomforest = "rf",
+  caret_rfe = "caret_rfe",
+  caretrfe = "caret_rfe",
+  rfe = "caret_rfe",
+  gbm = "gbm",
+  gradient_boosting = "gbm",
+  gradientboosting = "gbm",
+  boosting = "gbm",
+  rpart = "rpart",
+  decision_tree = "rpart",
+  decisiontree = "rpart",
+  tree = "rpart",
   xgb = "xgboost",
   xgboost = "xgboost",
   ga = "ga",

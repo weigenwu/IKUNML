@@ -10,6 +10,9 @@ IKUNML 是一个把常见机器学习特征筛选流程封装起来的 R 包，�
 - `svm_rfe`: 线性 SVM-RFE
 - `msvm_rfe`: 更贴近旧 `msvmRFE.R` 脚本的 multiple SVM-RFE
 - `rf`: 随机森林重要性排序 + 交叉验证确定特征数量
+- `caret_rfe`: `caret` 通用 RFE 框架，默认随机森林 RFE
+- `gbm`: 传统梯度提升树重要性排序 + 交叉验证确定特征数量
+- `rpart`: 决策树重要性排序 + 交叉验证确定特征数量
 - `xgboost`: XGBoost 重要性排序 + 交叉验证确定特征数量
 - `ga`: caret 遗传算法特征筛选
 
@@ -35,7 +38,7 @@ remotes::install_local("C:/Users/Weigen Wu/Desktop/IKUNML")
 ```r
 install.packages(c(
   "glmnet", "Boruta", "e1071", "randomForest", "xgboost",
-  "caret", "doParallel", "UpSetR", "VennDiagram"
+  "caret", "gbm", "rpart", "doParallel", "UpSetR", "VennDiagram"
 ))
 ```
 
@@ -169,10 +172,13 @@ ga_res <- run_ga(
 res <- run_feature_selection(
   data,
   group_col = "group",
-  methods = c("elastic_net", "boruta", "svm_rfe", "rf", "xgboost", "ga"),
+  methods = c("elastic_net", "boruta", "svm_rfe", "rf", "caret_rfe", "gbm", "rpart", "xgboost", "ga"),
   method_params = list(
     elastic_net = list(alpha = 0.5),
     svm_rfe = list(max_features = 200, halve_above = 50),
+    caret_rfe = list(sizes = c(5, 10, 20, 50, 100), number = 5),
+    gbm = list(n.trees = 500, cv_n.trees = 100, max_features = 200),
+    rpart = list(cp = 0.001, max_features = 200),
     ga = list(iters = 100, popSize = 50, nfolds = 10, ntree = 500, parallel = TRUE, cores = 8)
   ),
   output_dir = "IKUNML_results",
@@ -219,6 +225,45 @@ res <- run_feature_selection(
 ```
 
 `svm_rfe` 是轻量线性版本；`msvm_rfe` 更像你原来的脚本，会更慢，但结果更接近旧流程。
+
+## 其他机器学习筛选方法
+
+`caret_rfe` 适合想用 caret 的标准 RFE 流程时使用，默认调用随机森林函数：
+
+```r
+caret_res <- run_caret_rfe(
+  data,
+  group_col = "group",
+  sizes = c(5, 10, 20, 50, 100),
+  number = 5
+)
+```
+
+`gbm` 是传统梯度提升树，和 XGBoost 类似但依赖更轻：
+
+```r
+gbm_res <- run_gbm(
+  data,
+  group_col = "group",
+  n.trees = 500,
+  cv_n.trees = 100,
+  interaction.depth = 3,
+  shrinkage = 0.05,
+  max_features = 200
+)
+```
+
+`rpart` 是单棵决策树。它通常不会是最终最强模型，但可解释性高，适合做一个额外参考：
+
+```r
+tree_res <- run_rpart(
+  data,
+  group_col = "group",
+  cp = 0.001,
+  minsplit = 10,
+  max_features = 200
+)
+```
 
 ## 取交集和汇总命中次数
 
