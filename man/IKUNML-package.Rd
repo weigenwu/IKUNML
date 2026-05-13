@@ -9,6 +9,6 @@ classification data. It provides a common input format, method-specific
 parameter control, result export, and overlap summaries.
 }
 \details{
-Supported methods include LASSO, Boruta, SVM-RFE, random forest, XGBoost, and
-caret genetic algorithm feature selection.
+Supported methods include LASSO, elastic net, Boruta, SVM-RFE, random forest,
+XGBoost, and caret genetic algorithm feature selection.
 }

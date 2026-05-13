@@ -19,6 +19,7 @@ run_feature_selection <- function(data,
 
   runners <- list(
     lasso = run_lasso,
+    elastic_net = run_elastic_net,
     boruta = run_boruta,
     svm_rfe = run_svm_rfe,
     rf = run_rf,

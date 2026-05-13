@@ -13,6 +13,7 @@ run_lasso <- function(data,
                       drop_na = TRUE,
                       ...) {
   .require_pkg("glmnet")
+  penalty <- .penalty_name(alpha)
   lambda_choice <- match.arg(lambda_choice)
   prepared <- .ensure_ikun_data(data, group_col, feature_cols, positive_class, drop_na)
 
@@ -63,11 +64,13 @@ run_lasso <- function(data,
     coefficients = coefficient_table,
     lambda = cvfit[[lambda_choice]],
     lambda_choice = lambda_choice,
+    penalty = penalty,
     cvfit = cvfit,
     model = cvfit$glmnet.fit,
     params = list(
       family = family,
       alpha = alpha,
+      penalty = penalty,
       nlambda = nlambda,
       nfolds = nfolds,
       lambda_choice = lambda_choice,
@@ -76,4 +79,39 @@ run_lasso <- function(data,
       seed = seed
     )
   )
+}
+
+run_elastic_net <- function(data,
+                            group_col = "group",
+                            feature_cols = NULL,
+                            positive_class = NULL,
+                            seed = 123,
+                            family = "binomial",
+                            alpha = 0.5,
+                            nlambda = 100,
+                            nfolds = 10,
+                            lambda_choice = c("lambda.min", "lambda.1se"),
+                            standardize = TRUE,
+                            type.measure = NULL,
+                            drop_na = TRUE,
+                            ...) {
+  result <- run_lasso(
+    data = data,
+    group_col = group_col,
+    feature_cols = feature_cols,
+    positive_class = positive_class,
+    seed = seed,
+    family = family,
+    alpha = alpha,
+    nlambda = nlambda,
+    nfolds = nfolds,
+    lambda_choice = lambda_choice,
+    standardize = standardize,
+    type.measure = type.measure,
+    drop_na = drop_na,
+    ...
+  )
+  result$method <- "elastic_net"
+  class(result) <- c("ikun_method_result", "ikun_elastic_net_result")
+  result
 }

@@ -1,7 +1,11 @@
-.ikunml_methods <- c("lasso", "boruta", "svm_rfe", "rf", "xgboost", "ga")
+.ikunml_methods <- c("lasso", "elastic_net", "boruta", "svm_rfe", "rf", "xgboost", "ga")
 
 .method_aliases <- c(
   lasso = "lasso",
+  glmnet = "lasso",
+  elastic_net = "elastic_net",
+  elasticnet = "elastic_net",
+  enet = "elastic_net",
   boruta = "boruta",
   svm = "svm_rfe",
   svm_rfe = "svm_rfe",
@@ -57,6 +61,19 @@ available_methods <- function() {
     set.seed(seed)
   }
   invisible(seed)
+}
+
+.penalty_name <- function(alpha) {
+  if (!is.numeric(alpha) || length(alpha) != 1L || is.na(alpha) || alpha < 0 || alpha > 1) {
+    stop("alpha must be one numeric value between 0 and 1.", call. = FALSE)
+  }
+  if (identical(alpha, 1) || isTRUE(all.equal(alpha, 1))) {
+    "lasso"
+  } else if (identical(alpha, 0) || isTRUE(all.equal(alpha, 0))) {
+    "ridge"
+  } else {
+    "elastic_net"
+  }
 }
 
 .make_internal_names <- function(x) {

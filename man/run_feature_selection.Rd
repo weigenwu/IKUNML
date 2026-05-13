@@ -11,7 +11,10 @@ run_feature_selection(data, group_col = "group", feature_cols = NULL,
 \item{data}{Input data frame.}
 \item{group_col}{Name or index of the grouping column.}
 \item{feature_cols}{Optional feature column names or indices.}
-\item{methods}{Methods to run. Use \code{"all"} to request every supported method.}
+\item{methods}{Methods to run. Use \code{"all"} to request every supported method.
+Use \code{"lasso"} for the default \code{alpha = 1} \pkg{glmnet} model,
+\code{"elastic_net"} for the same backend with default \code{alpha = 0.5}, and
+\code{"ga"} for genetic algorithm feature selection.}
 \item{method_params}{Named list of method-specific parameter lists.}
 \item{positive_class}{Optional positive class label for binary methods.}
 \item{seed}{Random seed passed to methods unless overridden in \code{method_params}.}
@@ -39,5 +42,15 @@ res <- run_feature_selection(
   )
 )
 feature_intersection(res)
+
+enet_ga <- run_feature_selection(
+  data,
+  group_col = "group",
+  methods = c("elastic_net", "ga"),
+  method_params = list(
+    elastic_net = list(alpha = 0.5),
+    ga = list(iters = 50, popSize = 30)
+  )
+)
 }
 }

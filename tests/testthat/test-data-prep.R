@@ -38,3 +38,9 @@ test_that("feature hit summary counts selected features", {
   expect_equal(summary$Hit_Count[summary$feature == "b"], 2)
   expect_equal(feature_intersection(res), "b")
 })
+
+test_that("method aliases include elastic net and GA", {
+  expect_true("elastic_net" %in% available_methods())
+  expect_true("ga" %in% available_methods())
+  expect_equal(IKUNML:::.normalize_methods(c("enet", "genetic_algorithm")), c("elastic_net", "ga"))
+})
