@@ -4,6 +4,7 @@
 .Ruserdata
 *.Rcheck/
 data.csv
+ML.R
 IKUNML_results/
 RF/
 XGBoost/

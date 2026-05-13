@@ -1,4 +1,8 @@
-write_ikun_results <- function(result, output_dir = "IKUNML_results", overwrite = TRUE) {
+write_ikun_results <- function(result,
+                               output_dir = "IKUNML_results",
+                               overwrite = TRUE,
+                               write_plots = FALSE,
+                               save_models = FALSE) {
   if (!inherits(result, "ikunml_result")) {
     stop("result must be produced by run_feature_selection().", call. = FALSE)
   }
@@ -57,6 +61,15 @@ write_ikun_results <- function(result, output_dir = "IKUNML_results", overwrite 
         row.names = FALSE
       )
     }
+    if (save_models) {
+      saveRDS(method_result, file = file.path(method_dir, paste0(method, "_result.rds")))
+      if (!is.null(method_result$model)) {
+        saveRDS(method_result$model, file = file.path(method_dir, paste0(method, "_model.rds")))
+      }
+      if (!is.null(method_result$final_model) && !identical(method_result$final_model, method_result$model)) {
+        saveRDS(method_result$final_model, file = file.path(method_dir, paste0(method, "_final_model.rds")))
+      }
+    }
   }
 
   hit_summary <- feature_hit_summary(result)
@@ -82,6 +95,10 @@ write_ikun_results <- function(result, output_dir = "IKUNML_results", overwrite 
       stringsAsFactors = FALSE
     )
     utils::write.csv(error_table, file.path(output_dir, "method_errors.csv"), row.names = FALSE)
+  }
+
+  if (write_plots) {
+    write_ikun_plots(result, output_dir = output_dir)
   }
 
   invisible(output_dir)

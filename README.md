@@ -62,6 +62,8 @@ res <- run_feature_selection(
   methods = c("lasso", "boruta", "rf", "xgboost"),
   seed = 123,
   output_dir = "IKUNML_results",
+  write_plots = TRUE,
+  save_models = TRUE,
   method_params = list(
     lasso = list(
       alpha = 1,
@@ -171,9 +173,15 @@ res <- run_feature_selection(
     elastic_net = list(alpha = 0.5),
     ga = list(iters = 100, popSize = 50, nfolds = 10, ntree = 500, parallel = TRUE, cores = 8)
   ),
-  output_dir = "IKUNML_results"
+  output_dir = "IKUNML_results",
+  write_plots = TRUE,
+  save_models = TRUE
 )
 ```
+
+`write_plots = TRUE` 会导出类似旧脚本里的 PDF 诊断图，例如 LASSO/elastic net 的 CV 曲线、RF/XGBoost 的交叉验证准确率曲线、重要性条形图、Boruta 重要性图和 GA 进化曲线。
+
+`save_models = TRUE` 会把每种方法的结果对象和模型对象保存为 RDS。GA 比较耗时，建议正式跑 GA 时打开这个选项，后续可以直接 `readRDS()` 读取结果。
 
 ## 取交集和汇总命中次数
 
@@ -216,3 +224,7 @@ plot_venn(res, methods = c("elastic_net", "boruta", "rf"), file = "IKUNML_result
 - SVM-RFE 排名和交叉验证结果
 - `feature_hit_summary.csv`
 - `common_features.txt`
+
+如果设置 `write_plots = TRUE`，会额外导出各算法的 PDF 诊断图。
+
+如果设置 `save_models = TRUE`，会额外导出 `*_result.rds` 和 `*_model.rds`。

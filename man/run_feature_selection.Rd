@@ -5,7 +5,8 @@
 run_feature_selection(data, group_col = "group", feature_cols = NULL,
   methods = c("lasso", "boruta", "rf", "xgboost"),
   method_params = list(), positive_class = NULL, seed = 123,
-  output_dir = NULL, continue_on_error = FALSE, drop_na = TRUE)
+  output_dir = NULL, write_plots = FALSE, save_models = FALSE,
+  continue_on_error = FALSE, drop_na = TRUE)
 }
 \arguments{
 \item{data}{Input data frame.}
@@ -19,6 +20,8 @@ Use \code{"lasso"} for the default \code{alpha = 1} \pkg{glmnet} model,
 \item{positive_class}{Optional positive class label for binary methods.}
 \item{seed}{Random seed passed to methods unless overridden in \code{method_params}.}
 \item{output_dir}{Optional directory for exported result tables.}
+\item{write_plots}{Whether to export method diagnostic PDF plots when \code{output_dir} is set.}
+\item{save_models}{Whether to save method result and model objects as RDS files when \code{output_dir} is set.}
 \item{continue_on_error}{If \code{TRUE}, failed methods are recorded and later methods continue.}
 \item{drop_na}{Whether to remove incomplete samples.}
 }
@@ -50,7 +53,10 @@ enet_ga <- run_feature_selection(
   method_params = list(
     elastic_net = list(alpha = 0.5),
     ga = list(iters = 50, popSize = 30)
-  )
+  ),
+  output_dir = "IKUNML_results",
+  write_plots = TRUE,
+  save_models = TRUE
 )
 }
 }

@@ -11,6 +11,7 @@ run_xgboost <- function(data,
                         tolerance = 0,
                         prefer = c("largest", "smallest"),
                         threshold = 0.5,
+                        record_eval = TRUE,
                         verbose = 0,
                         drop_na = TRUE,
                         ...) {
@@ -32,13 +33,17 @@ run_xgboost <- function(data,
 
   dtrain <- xgboost::xgb.DMatrix(data = x, label = labels)
   .set_seed(seed)
-  xgb_model <- xgboost::xgb.train(
+  extra_args <- list(...)
+  train_args <- list(
     params = xgb_params,
     data = dtrain,
     nrounds = nrounds,
-    verbose = verbose,
-    ...
+    verbose = verbose
   )
+  if (record_eval && is.null(extra_args$watchlist)) {
+    train_args$watchlist <- list(train = dtrain)
+  }
+  xgb_model <- do.call(xgboost::xgb.train, c(train_args, extra_args))
 
   importance_df <- as.data.frame(
     xgboost::xgb.importance(feature_names = colnames(x), model = xgb_model),
@@ -117,6 +122,7 @@ run_xgboost <- function(data,
       tolerance = tolerance,
       prefer = prefer,
       threshold = threshold,
+      record_eval = record_eval,
       seed = seed
     )
   )

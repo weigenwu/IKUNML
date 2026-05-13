@@ -2,6 +2,7 @@
 ^\.github$
 ^\.gitignore$
 ^data[.]csv$
+^ML[.]R$
 ^IKUNML_results$
 ^.*[.]Rproj$
 ^\.Rproj[.]user$

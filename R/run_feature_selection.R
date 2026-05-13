@@ -6,6 +6,8 @@ run_feature_selection <- function(data,
                                   positive_class = NULL,
                                   seed = 123,
                                   output_dir = NULL,
+                                  write_plots = FALSE,
+                                  save_models = FALSE,
                                   continue_on_error = FALSE,
                                   drop_na = TRUE) {
   methods <- .normalize_methods(methods)
@@ -75,7 +77,12 @@ run_feature_selection <- function(data,
   )
 
   if (!is.null(output_dir)) {
-    write_ikun_results(output, output_dir = output_dir)
+    write_ikun_results(
+      output,
+      output_dir = output_dir,
+      write_plots = write_plots,
+      save_models = save_models
+    )
   }
 
   output
