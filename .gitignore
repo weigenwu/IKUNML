@@ -1,0 +1,13 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rcheck/
+data.csv
+IKUNML_results/
+RF/
+XGBoost/
+GA_Server/
+SVM/
+boruta/
+lasso/

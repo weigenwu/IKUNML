@@ -1,0 +1,35 @@
+Package: IKUNML
+Title: Configurable Machine Learning Feature Selection for Omics Data
+Version: 0.1.0
+Authors@R: 
+    person("Weigen", "Wu", email = "weigenwu@example.com", role = c("aut", "cre"))
+Description: A lightweight toolkit for configurable feature selection in
+    transcriptomic and other omics-style classification data. IKUNML wraps
+    LASSO, Boruta, SVM-RFE, random forest, XGBoost, and genetic algorithm
+    feature selection behind a common interface, then summarizes overlaps
+    across methods.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends:
+    R (>= 3.6.0)
+Imports:
+    graphics,
+    grDevices,
+    stats,
+    utils
+Suggests:
+    Boruta,
+    caret,
+    doParallel,
+    e1071,
+    foreach,
+    glmnet,
+    grid,
+    randomForest,
+    testthat (>= 3.0.0),
+    UpSetR,
+    VennDiagram,
+    xgboost
+Config/testthat/edition: 3

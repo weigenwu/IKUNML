@@ -1,0 +1,8 @@
+^\.git$
+^\.github$
+^\.gitignore$
+^data[.]csv$
+^IKUNML_results$
+^.*[.]Rproj$
+^\.Rproj[.]user$
+^README[.]Rmd$
