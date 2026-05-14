@@ -1,4 +1,7 @@
 .onAttach <- function(libname, pkgname) {
+  if (isFALSE(getOption("IKUNML.startup", TRUE))) {
+    return(invisible())
+  }
   messages <- c(
     "\u522b\u611f\u5192",
     "\u505a\u4e00\u4e2a\u771f\u6b63\u7684man",

@@ -1,6 +1,6 @@
 Package: IKUNML
 Title: Configurable Machine Learning Feature Selection for Omics Data
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person("Weigen", "Wu", email = "weigenwu@example.com", role = c("aut", "cre"))
 Author: Weigen Wu
@@ -34,12 +34,15 @@ Suggests:
     gbm,
     glmnet,
     grid,
+    knitr,
     openxlsx,
     randomForest,
+    rmarkdown,
     rpart,
     testthat (>= 3.0.0),
     UpSetR,
     VennDiagram,
     yaml,
     xgboost
+VignetteBuilder: knitr
 Config/testthat/edition: 3

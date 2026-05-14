@@ -1,0 +1,107 @@
+---
+title: "IKUNML Workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{IKUNML Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+```
+
+## Overview
+
+IKUNML wraps several feature-selection methods for omics-style classification
+data and exports method-specific results, plots, overlap summaries, reports,
+stability selection results, and validation outputs.
+
+## Example Data
+
+```{r}
+library(IKUNML)
+
+data <- read.csv(
+  system.file("extdata", "example_data.csv", package = "IKUNML"),
+  row.names = 1,
+  check.names = FALSE
+)
+```
+
+## Run Feature Selection
+
+```{r}
+res <- run_feature_selection(
+  data,
+  group_col = "group",
+  methods = c("lasso", "SVM", "rf"),
+  output_dir = "IKUNML_results",
+  method_params = list(
+    lasso = list(alpha = 0.5, lambda_choice = "lambda.min"),
+    SVM = list(k = 10, halve_above = 50, max_features = 200, tolerance = 0.02),
+    rf = list(ntree = 1000, cv_ntree = 300, max_features = 200, tolerance = 0.02)
+  )
+)
+```
+
+## Review Overlaps
+
+```{r}
+feature_intersection(res)
+feature_hit_summary(res)
+write_ikun_report(res, output_dir = "IKUNML_results")
+```
+
+## Stability Selection
+
+```{r}
+stab <- stability_selection(
+  data,
+  group_col = "group",
+  methods = c("lasso", "SVM", "rf"),
+  n_iter = 100,
+  sample_fraction = 0.8,
+  min_frequency = 0.6,
+  parallel = TRUE,
+  cores = 8,
+  output_dir = "IKUNML_stability"
+)
+```
+
+## Validate Selected Features
+
+```{r}
+val <- validate_selected_features(
+  data,
+  result = res,
+  min_hits = 2,
+  group_col = "group",
+  positive_class = "Tumor",
+  model = "glm",
+  output_dir = "IKUNML_validation"
+)
+```
+
+## Nested Cross-Validation
+
+```{r}
+ncv <- nested_cv_feature_selection(
+  data,
+  group_col = "group",
+  methods = c("lasso", "SVM", "rf"),
+  min_hits = 2,
+  model = "glm",
+  outer_folds = 5,
+  output_dir = "IKUNML_nested_cv"
+)
+```
+
+## Quiet Startup
+
+IKUNML prints a random startup message by default. Disable it for scripts:
+
+```{r}
+options(IKUNML.startup = FALSE)
+library(IKUNML)
+```

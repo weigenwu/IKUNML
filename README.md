@@ -37,7 +37,11 @@ remotes::install_github("weigenwu/IKUNML")
 ```r
 library(IKUNML)
 
-data <- read.csv("data.csv", row.names = 1, check.names = FALSE)
+data <- read.csv(
+  system.file("extdata", "example_data.csv", package = "IKUNML"),
+  row.names = 1,
+  check.names = FALSE
+)
 
 res <- run_feature_selection(
   data = data,
@@ -77,6 +81,15 @@ res <- run_feature_selection(
 - `run_metadata.csv`
 - `method_parameters.csv`
 - `IKUNML_report.html`
+
+## 启动提示
+
+加载包时会随机显示一句启动提示。如果正式脚本里想安静加载，可以先设置：
+
+```r
+options(IKUNML.startup = FALSE)
+library(IKUNML)
+```
 
 ## 进度和耗时
 
