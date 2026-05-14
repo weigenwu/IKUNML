@@ -11,7 +11,8 @@ plot_venn(result, methods = NULL, file = NULL, width = 8, height = 8,
   fill = NULL, alpha = 0.6, ...)
 
 write_ikun_plots(result, output_dir = "IKUNML_results", methods = NULL,
-  top_n = 30)
+  top_n = 30, formats = c("pdf", "tiff"), tiff_res = 300,
+  folder_names = NULL)
 }
 \arguments{
 \item{result}{An \code{ikunml_result} object.}
@@ -24,6 +25,9 @@ write_ikun_plots(result, output_dir = "IKUNML_results", methods = NULL,
 \item{alpha}{Venn fill transparency.}
 \item{...}{Additional arguments passed to the plotting backend.}
 \item{top_n}{Number of top features shown in method diagnostic bar plots.}
+\item{formats}{Plot formats to export. Supports \code{"pdf"} and \code{"tiff"}.}
+\item{tiff_res}{TIFF resolution in dots per inch.}
+\item{folder_names}{Optional named character vector overriding method folder names.}
 }
 \value{
 The plotting data or grob object, invisibly.
@@ -31,8 +35,8 @@ The plotting data or grob object, invisibly.
 \description{
 Draw UpSet or Venn diagrams for selected feature overlaps. Use UpSet plots for
 six or more methods.
-\code{write_ikun_plots()} writes method-specific diagnostic plots such as
-glmnet CV curves, SVM-RFE/mSVM-RFE error and accuracy curves, RF/caret
-RFE/GBM/rpart/XGBoost CV accuracy curves, feature-importance bar plots, Boruta
-importance plots, and GA evolution curves.
+\code{write_ikun_plots()} writes method-specific diagnostic plots in PDF and
+TIFF by default, including glmnet CV curves, SVM-RFE error and accuracy curves,
+RF/caret RFE/GBM/rpart/XGBoost CV accuracy curves, feature-importance bar
+plots, Boruta importance plots, and GA evolution curves.
 }

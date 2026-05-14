@@ -1,8 +1,30 @@
 .write_pdf_plot <- function(file, width, height, plotter) {
-  grDevices::pdf(file, width = width, height = height)
-  on.exit(grDevices::dev.off(), add = TRUE)
-  plotter()
-  invisible(file)
+  formats <- getOption("IKUNML.plot_formats", "pdf")
+  formats <- unique(tolower(formats))
+  tiff_res <- getOption("IKUNML.tiff_res", 300)
+  written <- character()
+
+  if ("pdf" %in% formats) {
+    grDevices::pdf(file, width = width, height = height)
+    tryCatch(plotter(), finally = grDevices::dev.off())
+    written <- c(written, file)
+  }
+
+  if (any(c("tif", "tiff") %in% formats)) {
+    tiff_file <- sub("[.]pdf$", ".tiff", file)
+    grDevices::tiff(
+      tiff_file,
+      width = width,
+      height = height,
+      units = "in",
+      res = tiff_res,
+      compression = "lzw"
+    )
+    tryCatch(plotter(), finally = grDevices::dev.off())
+    written <- c(written, tiff_file)
+  }
+
+  invisible(written)
 }
 
 .plot_metric_curve <- function(metrics, y_col, title, ylab, color = "#4DBBD5") {
@@ -277,7 +299,10 @@
 write_ikun_plots <- function(result,
                              output_dir = "IKUNML_results",
                              methods = NULL,
-                             top_n = 30) {
+                             top_n = 30,
+                             formats = c("pdf", "tiff"),
+                             tiff_res = 300,
+                             folder_names = NULL) {
   if (!inherits(result, "ikunml_result")) {
     stop("result must be produced by run_feature_selection().", call. = FALSE)
   }
@@ -290,10 +315,16 @@ write_ikun_plots <- function(result,
   if (!dir.exists(output_dir)) {
     dir.create(output_dir, recursive = TRUE)
   }
+  old_formats <- getOption("IKUNML.plot_formats")
+  old_tiff_res <- getOption("IKUNML.tiff_res")
+  options(IKUNML.plot_formats = formats, IKUNML.tiff_res = tiff_res)
+  on.exit({
+    options(IKUNML.plot_formats = old_formats, IKUNML.tiff_res = old_tiff_res)
+  }, add = TRUE)
 
   for (method in methods) {
     method_result <- result$results[[method]]
-    method_dir <- file.path(output_dir, method)
+    method_dir <- file.path(output_dir, .method_folder_name(method, folder_names))
     if (!dir.exists(method_dir)) {
       dir.create(method_dir, recursive = TRUE)
     }
@@ -302,7 +333,7 @@ write_ikun_plots <- function(result,
       .plot_lasso_diagnostics(method_result, method_dir)
     } else if (identical(method, "boruta")) {
       .plot_boruta_diagnostics(method_result, method_dir)
-    } else if (method %in% c("svm_rfe", "msvm_rfe")) {
+    } else if (identical(method, "svm_rfe")) {
       .plot_svm_diagnostics(method_result, method_dir, top_n = top_n)
     } else if (identical(method, "rf")) {
       .plot_rf_diagnostics(method_result, method_dir, top_n = top_n)

@@ -1,5 +1,5 @@
 .ikunml_methods <- c(
-  "lasso", "elastic_net", "boruta", "svm_rfe", "msvm_rfe",
+  "lasso", "elastic_net", "boruta", "svm_rfe",
   "rf", "caret_rfe", "gbm", "rpart", "xgboost", "ga"
 )
 
@@ -13,9 +13,9 @@
   svm = "svm_rfe",
   svm_rfe = "svm_rfe",
   svmrfe = "svm_rfe",
-  msvm = "msvm_rfe",
-  msvm_rfe = "msvm_rfe",
-  msvmrfe = "msvm_rfe",
+  msvm = "svm_rfe",
+  msvm_rfe = "svm_rfe",
+  msvmrfe = "svm_rfe",
   rf = "rf",
   random_forest = "rf",
   randomforest = "rf",
@@ -196,4 +196,26 @@ print.ikun_method_result <- function(x, ...) {
     cat("\n")
   }
   invisible(x)
+}
+
+.method_folder_name <- function(method, folder_names = NULL) {
+  defaults <- c(
+    lasso = "lasso",
+    elastic_net = "elastic_net",
+    boruta = "boruta",
+    svm_rfe = "SVM",
+    rf = "RF",
+    caret_rfe = "caret_rfe",
+    gbm = "GBM",
+    rpart = "rpart",
+    xgboost = "XGBoost",
+    ga = "GA"
+  )
+  if (!is.null(folder_names) && method %in% names(folder_names)) {
+    override <- folder_names[[method]]
+    if (!is.null(override) && length(override) == 1L && !is.na(override) && nzchar(override)) {
+      return(override)
+    }
+  }
+  defaults[[method]] %||% method
 }

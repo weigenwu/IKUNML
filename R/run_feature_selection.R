@@ -5,9 +5,13 @@ run_feature_selection <- function(data,
                                   method_params = list(),
                                   positive_class = NULL,
                                   seed = 123,
-                                  output_dir = NULL,
-                                  write_plots = FALSE,
+                                  output_dir = "IKUNML_results",
+                                  write_plots = TRUE,
                                   save_models = FALSE,
+                                  plot_formats = c("pdf", "tiff"),
+                                  tiff_res = 300,
+                                  folder_names = NULL,
+                                  progress = TRUE,
                                   continue_on_error = FALSE,
                                   drop_na = TRUE) {
   methods <- .normalize_methods(methods)
@@ -24,7 +28,6 @@ run_feature_selection <- function(data,
     elastic_net = run_elastic_net,
     boruta = run_boruta,
     svm_rfe = run_svm_rfe,
-    msvm_rfe = run_msvm_rfe,
     rf = run_rf,
     caret_rfe = run_caret_rfe,
     gbm = run_gbm,
@@ -35,8 +38,11 @@ run_feature_selection <- function(data,
 
   results <- list()
   errors <- list()
+  runtime_records <- list()
+  total_start <- Sys.time()
 
-  for (method in methods) {
+  for (method_index in seq_along(methods)) {
+    method <- methods[[method_index]]
     params <- method_params[[method]] %||% list()
     alias_names <- names(.method_aliases)[.method_aliases == method]
     for (alias in alias_names) {
@@ -50,20 +56,84 @@ run_feature_selection <- function(data,
     }
 
     call_args <- c(list(data = prepared), params)
+    started_at <- Sys.time()
+    if (isTRUE(progress)) {
+      message(sprintf(
+        "[IKUNML] (%d/%d) Starting %s at %s",
+        method_index,
+        length(methods),
+        method,
+        format(started_at, "%Y-%m-%d %H:%M:%S")
+      ))
+    }
     method_result <- tryCatch(
       do.call(runners[[method]], call_args),
       error = function(e) e
     )
+    completed_at <- Sys.time()
+    elapsed_seconds <- as.numeric(difftime(completed_at, started_at, units = "secs"))
 
     if (inherits(method_result, "error")) {
       errors[[method]] <- method_result$message
+      runtime_records[[method]] <- data.frame(
+        method = method,
+        status = "failed",
+        started_at = format(started_at, "%Y-%m-%d %H:%M:%S"),
+        completed_at = format(completed_at, "%Y-%m-%d %H:%M:%S"),
+        elapsed_seconds = elapsed_seconds,
+        selected_features = NA_integer_,
+        message = method_result$message,
+        stringsAsFactors = FALSE
+      )
+      if (isTRUE(progress)) {
+        message(sprintf("[IKUNML] (%d/%d) Failed %s after %.2f seconds", method_index, length(methods), method, elapsed_seconds))
+      }
       if (!continue_on_error) {
         stop("Method '", method, "' failed: ", method_result$message, call. = FALSE)
       }
     } else {
+      method_result$started_at <- started_at
+      method_result$completed_at <- completed_at
+      method_result$runtime_seconds <- elapsed_seconds
       results[[method]] <- method_result
+      runtime_records[[method]] <- data.frame(
+        method = method,
+        status = "completed",
+        started_at = format(started_at, "%Y-%m-%d %H:%M:%S"),
+        completed_at = format(completed_at, "%Y-%m-%d %H:%M:%S"),
+        elapsed_seconds = elapsed_seconds,
+        selected_features = length(method_result$selected_features),
+        message = "",
+        stringsAsFactors = FALSE
+      )
+      if (isTRUE(progress)) {
+        message(sprintf(
+          "[IKUNML] (%d/%d) Finished %s in %.2f seconds; selected %d feature(s)",
+          method_index,
+          length(methods),
+          method,
+          elapsed_seconds,
+          length(method_result$selected_features)
+        ))
+      }
     }
   }
+  total_completed <- Sys.time()
+  runtimes <- if (length(runtime_records) > 0L) {
+    do.call(rbind, runtime_records)
+  } else {
+    data.frame(
+      method = character(),
+      status = character(),
+      started_at = character(),
+      completed_at = character(),
+      elapsed_seconds = numeric(),
+      selected_features = integer(),
+      message = character(),
+      stringsAsFactors = FALSE
+    )
+  }
+  rownames(runtimes) <- NULL
 
   output <- structure(
     list(
@@ -72,6 +142,8 @@ run_feature_selection <- function(data,
       errors = errors,
       feature_map = prepared$feature_map,
       samples = prepared$samples,
+      runtimes = runtimes,
+      total_runtime_seconds = as.numeric(difftime(total_completed, total_start, units = "secs")),
       group_col = group_col,
       positive_class = positive_class,
       seed = seed,
@@ -85,7 +157,10 @@ run_feature_selection <- function(data,
       output,
       output_dir = output_dir,
       write_plots = write_plots,
-      save_models = save_models
+      save_models = save_models,
+      plot_formats = plot_formats,
+      tiff_res = tiff_res,
+      folder_names = folder_names
     )
   }
 
@@ -102,6 +177,9 @@ print.ikunml_result <- function(x, ...) {
   }
   if (length(x$errors) > 0L) {
     cat("Failed methods:", paste(names(x$errors), collapse = ", "), "\n")
+  }
+  if (!is.null(x$total_runtime_seconds)) {
+    cat("Total runtime:", sprintf("%.2f seconds", x$total_runtime_seconds), "\n")
   }
   invisible(x)
 }

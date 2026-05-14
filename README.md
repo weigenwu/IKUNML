@@ -1,39 +1,21 @@
 # IKUNML
 
-IKUNML 是一个把常见机器学习特征筛选流程封装起来的 R 包，适合表达矩阵、tsRNA、mRNA 等二分类或多分类分组数据。
+IKUNML 是一个用于组学数据机器学习特征筛选的 R 包。输入一个带分组列的表达矩阵后，可以选择运行 LASSO/elastic net、Boruta、SVM-RFE、RF、caret RFE、GBM、rpart、XGBoost、GA 等方法，并自动导出每种算法的结果文件夹。
 
-当前支持的方法：
+## 支持的方法
 
 - `lasso`: 基于 `glmnet`，默认 `alpha = 1`
 - `elastic_net`: 基于 `glmnet`，默认 `alpha = 0.5`
 - `boruta`: Boruta 随机森林重要性筛选
-- `svm_rfe`: 线性 SVM-RFE
-- `msvm_rfe`: 更贴近旧 `msvmRFE.R` 脚本的 multiple SVM-RFE
-- `rf`: 随机森林重要性排序 + 交叉验证确定特征数量
+- `svm_rfe`: 使用旧 `msvmRFE.R` 风格的 multiple SVM-RFE
+- `rf`: 随机森林重要性排序 + 交叉验证筛选变量数
 - `caret_rfe`: `caret` 通用 RFE 框架，默认随机森林 RFE
-- `gbm`: 传统梯度提升树重要性排序 + 交叉验证确定特征数量
-- `rpart`: 决策树重要性排序 + 交叉验证确定特征数量
-- `xgboost`: XGBoost 重要性排序 + 交叉验证确定特征数量
-- `ga`: caret 遗传算法特征筛选
+- `gbm`: 传统梯度提升树重要性排序 + 交叉验证筛选变量数
+- `rpart`: 决策树重要性排序 + 交叉验证筛选变量数
+- `xgboost`: XGBoost 重要性排序 + 交叉验证筛选变量数
+- `ga`: `caret` 遗传算法特征筛选
 
-注意：GA 已经纳入包中，但通常非常耗时，所以默认示例不会自动运行 GA。需要时在 `methods` 里显式加入 `"ga"`。
-
-## 安装
-
-从 GitHub 安装：
-
-```r
-install.packages("remotes")
-remotes::install_github("weigenwu/IKUNML")
-```
-
-本地安装：
-
-```r
-remotes::install_local("C:/Users/Weigen Wu/Desktop/IKUNML")
-```
-
-按需安装算法依赖：
+## 安装依赖
 
 ```r
 install.packages(c(
@@ -42,18 +24,14 @@ install.packages(c(
 ))
 ```
 
-## 数据格式
-
-输入数据应为 `data.frame`，一列是分组，其余列是数值型特征：
+从 GitHub 安装：
 
 ```r
-data <- read.csv("data.csv", row.names = 1, check.names = FALSE)
-head(data[, 1:5])
+install.packages("remotes")
+remotes::install_github("weigenwu/IKUNML")
 ```
 
-默认分组列名为 `group`。特征名可以包含 `-`、`.` 等字符，IKUNML 内部会转换成 R 安全列名，输出结果会自动还原成原始特征名。
-
-## 一次运行多种方法
+## 基本用法
 
 ```r
 library(IKUNML)
@@ -63,250 +41,160 @@ data <- read.csv("data.csv", row.names = 1, check.names = FALSE)
 res <- run_feature_selection(
   data = data,
   group_col = "group",
-  methods = c("lasso", "boruta", "rf", "xgboost"),
-  seed = 123,
+  methods = c("lasso", "boruta", "svm_rfe", "rf", "xgboost"),
   output_dir = "IKUNML_results",
-  write_plots = TRUE,
-  save_models = TRUE,
   method_params = list(
-    lasso = list(
-      alpha = 1,
-      nfolds = 10,
-      lambda_choice = "lambda.min"
-    ),
-    boruta = list(
-      ntree = 5000,
-      maxRuns = 100,
-      pValue = 0.001
-    ),
-    rf = list(
-      ntree = 5000,
-      cv_ntree = 500,
-      max_features = 200,
-      nfolds = 5,
-      tolerance = 0,
-      prefer = "largest"
-    ),
-    xgboost = list(
-      nrounds = 500,
-      cv_nrounds = 100,
-      max_features = 200,
-      nfolds = 5,
-      tolerance = 0,
-      params = list(max_depth = 3, eta = 0.05)
-    )
+    lasso = list(alpha = 1, lambda_choice = "lambda.min"),
+    boruta = list(ntree = 5000, maxRuns = 100, pValue = 0.001),
+    svm_rfe = list(k = 10, halve_above = 50, max_features = 200, tolerance = 0.02),
+    rf = list(ntree = 5000, cv_ntree = 500, max_features = 200, tolerance = 0.02),
+    xgboost = list(nrounds = 500, cv_nrounds = 100, max_features = 200, tolerance = 0.02)
   )
 )
 ```
 
-## LASSO、Ridge、Elastic Net
+默认会生成 `IKUNML_results/`。每种算法一个子文件夹，例如：
 
-`glmnet` 的 `alpha` 可以自由调整：
+- `IKUNML_results/lasso/`
+- `IKUNML_results/boruta/`
+- `IKUNML_results/SVM/`
+- `IKUNML_results/RF/`
+- `IKUNML_results/XGBoost/`
 
-- `alpha = 1`: LASSO
-- `alpha = 0`: Ridge
-- `0 < alpha < 1`: Elastic net，例如 `alpha = 0.5`
+每个方法文件夹会包含：
 
-直接跑 elastic net：
+- `*_selected_features.txt`
+- `*_selected_features.csv`
+- 该方法的系数、排名、重要性或交叉验证表
+- 诊断图的 `.pdf` 和 `.tiff`
 
-```r
-enet_res <- run_elastic_net(
-  data,
-  group_col = "group",
-  alpha = 0.5,
-  nfolds = 10,
-  lambda_choice = "lambda.min"
-)
+根目录还会导出：
+
+- `feature_hit_summary.csv`
+- `common_features.txt`
+- `method_runtime.csv`
+
+## 进度和耗时
+
+运行时会显示当前跑到哪个算法，以及每个算法耗时：
+
+```text
+[IKUNML] (1/3) Starting lasso at 2026-05-14 10:00:00
+[IKUNML] (1/3) Finished lasso in 1.24 seconds; selected 8 feature(s)
 ```
 
-或者在统一入口里写：
+耗时结果保存在：
 
 ```r
-res <- run_feature_selection(
-  data,
-  group_col = "group",
-  methods = c("elastic_net", "rf", "xgboost"),
-  method_params = list(
-    elastic_net = list(alpha = 0.5, lambda_choice = "lambda.min"),
-    rf = list(ntree = 5000, cv_ntree = 500, max_features = 200),
-    xgboost = list(nrounds = 500, cv_nrounds = 100, max_features = 200)
-  )
-)
+res$runtimes
 ```
 
-如果你仍然使用 `methods = "lasso"`，也可以直接传 `alpha = 0.5`：
+也会自动写入：
+
+```r
+IKUNML_results/method_runtime.csv
+```
+
+如果不想显示进度：
+
+```r
+res <- run_feature_selection(data, progress = FALSE)
+```
+
+## 只跑一个算法
+
+例如只跑 LASSO：
 
 ```r
 res <- run_feature_selection(
   data,
   group_col = "group",
   methods = "lasso",
+  output_dir = "IKUNML_results",
   method_params = list(
-    lasso = list(alpha = 0.5)
+    lasso = list(alpha = 1, lambda_choice = "lambda.min")
   )
 )
 ```
 
-## GA 遗传算法
+会生成 `IKUNML_results/lasso/`，里面包含 LASSO 的 txt/csv 变量列表、系数表、CV 曲线和系数路径图，图片同时有 PDF 和 TIFF。
 
-GA 已经封装为 `run_ga()`，也可以通过 `methods = "ga"` 调用。
+## 宽容度 tolerance
 
-单独运行：
+SVM、RF、XGBoost、GBM、rpart 都支持 `tolerance`。
 
-```r
-ga_res <- run_ga(
-  data,
-  group_col = "group",
-  iters = 100,
-  popSize = 50,
-  nfolds = 10,
-  ntree = 500,
-  parallel = TRUE,
-  cores = 8
-)
-```
+- SVM：`tolerance` 表示允许误差率比最低误差升高多少。
+- RF/XGBoost/GBM/rpart：`tolerance` 表示允许准确率比最高准确率下降多少。
 
-和其他方法一起运行：
+例如 `tolerance = 0.02` 表示允许 2% 的性能宽容，并在可接受范围内用 `prefer = "largest"` 选择变量数最多的方案：
 
 ```r
 res <- run_feature_selection(
   data,
   group_col = "group",
-  methods = c("elastic_net", "boruta", "svm_rfe", "rf", "caret_rfe", "gbm", "rpart", "xgboost", "ga"),
+  methods = c("svm_rfe", "rf", "xgboost"),
   method_params = list(
-    elastic_net = list(alpha = 0.5),
-    svm_rfe = list(max_features = 200, halve_above = 50),
-    caret_rfe = list(sizes = c(5, 10, 20, 50, 100), number = 5),
-    gbm = list(n.trees = 500, cv_n.trees = 100, max_features = 200),
-    rpart = list(cp = 0.001, max_features = 200),
-    ga = list(iters = 100, popSize = 50, nfolds = 10, ntree = 500, parallel = TRUE, cores = 8)
-  ),
-  output_dir = "IKUNML_results",
-  write_plots = TRUE,
-  save_models = TRUE
+    svm_rfe = list(tolerance = 0.02, prefer = "largest"),
+    rf = list(tolerance = 0.02, prefer = "largest"),
+    xgboost = list(tolerance = 0.02, prefer = "largest")
+  )
 )
 ```
 
-`write_plots = TRUE` 会导出类似旧脚本里的 PDF 诊断图，例如 LASSO/elastic net 的 CV 曲线、RF/XGBoost 的交叉验证准确率曲线、重要性条形图、Boruta 重要性图和 GA 进化曲线。
+## SVM-RFE
 
-`save_models = TRUE` 会把每种方法的结果对象和模型对象保存为 RDS。GA 比较耗时，建议正式跑 GA 时打开这个选项，后续可以直接 `readRDS()` 读取结果。
-
-## 旧版 msvmRFE.R 风格
-
-如果你想尽量贴近旧脚本里 `source("msvmRFE.R")` 后运行的流程，用 `msvm_rfe`：
+现在只有一个 SVM 入口：`svm_rfe`。它内部使用贴近你旧 `msvmRFE.R` 的流程，包括 `k`、`halve_above`、fold-specific ranking 和特征数量 sweep。
+旧脚本中的 `halve.above` 也可以继续传入；`cost` 和 `scale` 会被映射到新的 SVM-RFE 排名/性能评估参数。
 
 ```r
-msvm_res <- run_msvm_rfe(
+svm_res <- run_svm_rfe(
   data,
   group_col = "group",
   k = 10,
   halve_above = 50,
   nfolds = 5,
   max_features = 200,
-  rank_cost = 10,
   tune = TRUE,
   tune_ranges = list(gamma = 2^(-12:0), cost = 2^(-6:6)),
-  tolerance = 0,
+  tolerance = 0.02,
   prefer = "largest"
 )
 ```
 
-也可以放进统一入口：
+旧别名 `msvm_rfe`、`msvmrfe` 仍可输入，但都会自动映射到 `svm_rfe`，不会再产生两个 SVM 方法。
+
+## 图片格式
+
+默认导出 PDF 和 TIFF：
 
 ```r
-res <- run_feature_selection(
-  data,
-  group_col = "group",
-  methods = c("msvm_rfe", "rf", "xgboost"),
-  method_params = list(
-    msvm_rfe = list(k = 10, halve_above = 50, max_features = 200)
-  )
-)
+res <- run_feature_selection(data, plot_formats = c("pdf", "tiff"), tiff_res = 300)
 ```
 
-`svm_rfe` 是轻量线性版本；`msvm_rfe` 更像你原来的脚本，会更慢，但结果更接近旧流程。
-
-## 其他机器学习筛选方法
-
-`caret_rfe` 适合想用 caret 的标准 RFE 流程时使用，默认调用随机森林函数：
+只导出 PDF：
 
 ```r
-caret_res <- run_caret_rfe(
-  data,
-  group_col = "group",
-  sizes = c(5, 10, 20, 50, 100),
-  number = 5
-)
+res <- run_feature_selection(data, plot_formats = "pdf")
 ```
 
-`gbm` 是传统梯度提升树，和 XGBoost 类似但依赖更轻：
+不导出任何文件：
 
 ```r
-gbm_res <- run_gbm(
-  data,
-  group_col = "group",
-  n.trees = 500,
-  cv_n.trees = 100,
-  interaction.depth = 3,
-  shrinkage = 0.05,
-  max_features = 200
-)
+res <- run_feature_selection(data, output_dir = NULL)
 ```
 
-`rpart` 是单棵决策树。它通常不会是最终最强模型，但可解释性高，适合做一个额外参考：
-
-```r
-tree_res <- run_rpart(
-  data,
-  group_col = "group",
-  cp = 0.001,
-  minsplit = 10,
-  max_features = 200
-)
-```
-
-## 取交集和汇总命中次数
+## 交集和命中次数
 
 ```r
 common <- feature_intersection(res)
-common
-
 hit_table <- feature_hit_summary(res)
-write.csv(hit_table, "IKUNML_results/feature_hit_summary.csv", row.names = FALSE)
-```
 
-如果想要“至少被 4 种方法选中”的特征：
-
-```r
 feature_intersection(res, min_hits = 4)
 ```
 
-## 可视化
-
-6 种及以上方法建议使用 UpSet 图：
+## UpSet 和 Venn
 
 ```r
 plot_upset(res, file = "IKUNML_results/upset.pdf", nintersects = 30)
+plot_venn(res, methods = c("lasso", "boruta", "rf"), file = "IKUNML_results/venn.pdf")
 ```
-
-5 种及以下方法可以使用 Venn 图：
-
-```r
-plot_venn(res, methods = c("elastic_net", "boruta", "rf"), file = "IKUNML_results/venn.pdf")
-```
-
-## 结果文件
-
-设置 `output_dir` 后会自动导出：
-
-- 每种方法的 `*_selected_features.txt`
-- LASSO / elastic net 系数表
-- Boruta 统计表
-- RF / XGBoost 重要性表和交叉验证结果
-- SVM-RFE 排名和交叉验证结果
-- `feature_hit_summary.csv`
-- `common_features.txt`
-
-如果设置 `write_plots = TRUE`，会额外导出各算法的 PDF 诊断图。
-
-如果设置 `save_models = TRUE`，会额外导出 `*_result.rds` 和 `*_model.rds`。

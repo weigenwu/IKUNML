@@ -185,6 +185,7 @@ run_msvm_rfe <- function(data,
                          performance_gamma = NULL,
                          verbose = FALSE,
                          drop_na = TRUE,
+                         method_name = "svm_rfe",
                          ...) {
   .require_pkg("e1071")
   prefer <- match.arg(prefer)
@@ -274,7 +275,7 @@ run_msvm_rfe <- function(data,
   )
 
   .method_result(
-    method = "msvm_rfe",
+    method = method_name,
     selected_internal = selected,
     prepared = prepared,
     ranking = ranking,
