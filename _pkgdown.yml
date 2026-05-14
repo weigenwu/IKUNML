@@ -1,0 +1,48 @@
+url: https://weigenwu.github.io/IKUNML/
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [github]
+
+reference:
+  - title: Data Preparation
+    contents:
+      - prepare_ikun_data
+      - available_methods
+      - run_feature_selection_config
+  - title: Feature Selection
+    contents:
+      - run_feature_selection
+      - run_lasso
+      - run_elastic_net
+      - run_boruta
+      - run_SVM
+      - run_rf
+      - run_caret_rfe
+      - run_gbm
+      - run_rpart
+      - run_xgboost
+      - run_ga
+  - title: Reporting and Output
+    contents:
+      - write_ikun_results
+      - write_ikun_plots
+      - write_ikun_report
+      - write_ikun_excel_report
+      - export_reproducibility_info
+  - title: Stability and Validation
+    contents:
+      - stability_selection
+      - validate_selected_features
+      - nested_cv_feature_selection
+  - title: Intersections and Plots
+    contents:
+      - feature_sets
+      - feature_intersection
+      - feature_hit_summary
+      - plot_upset
+      - plot_venn

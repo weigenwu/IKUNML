@@ -367,6 +367,43 @@ run_ga(data, parallel = TRUE, cores = 8)
 
 仓库已加入 GitHub Actions：每次 push 或 pull request 会自动运行 `R CMD check`。
 
+## 可复现性记录
+
+如果后续要写文章、补方法学或复查环境，可以把当前 R 环境信息导出到一个文件夹：
+
+```r
+export_reproducibility_info(
+  output_dir = "IKUNML_reproducibility",
+  include_installed_packages = TRUE
+)
+```
+
+主要输出：
+
+- `sessionInfo.txt`
+- `system_info.csv`
+- `installed_packages.csv`
+
+如果你使用 `renv` 管理项目环境，也可以额外生成 lockfile：
+
+```r
+export_reproducibility_info(
+  output_dir = "IKUNML_reproducibility",
+  include_renv_lock = TRUE,
+  renv_lockfile = "renv.lock"
+)
+```
+
+## 包网站和更新日志
+
+仓库已加入 `pkgdown` 配置和发布工作流。推送到 `main` 后，GitHub Actions 可以构建包网站；如果 GitHub Pages 已开启，网站地址为：
+
+```text
+https://weigenwu.github.io/IKUNML/
+```
+
+版本变化记录在 `NEWS.md`。
+
 ## UpSet 和 Venn
 
 ```r
