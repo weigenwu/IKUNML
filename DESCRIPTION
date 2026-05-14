@@ -7,7 +7,9 @@ Description: A lightweight toolkit for configurable feature selection in
     transcriptomic and other omics-style classification data. IKUNML wraps
     LASSO/elastic net, Boruta, SVM-RFE, random forest, gradient boosting,
     decision trees, XGBoost, caret RFE, and genetic algorithm feature selection
-    behind a common interface, then summarizes overlaps across methods.
+    behind a common interface, then summarizes overlaps across methods and
+    supports reporting, stability selection, model validation, and nested
+    cross-validation workflows.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -19,6 +21,7 @@ Imports:
     grDevices,
     parallel,
     stats,
+    tools,
     utils
 Suggests:
     Boruta,
@@ -29,10 +32,12 @@ Suggests:
     gbm,
     glmnet,
     grid,
+    openxlsx,
     randomForest,
     rpart,
     testthat (>= 3.0.0),
     UpSetR,
     VennDiagram,
+    yaml,
     xgboost
 Config/testthat/edition: 3

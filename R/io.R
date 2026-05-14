@@ -5,7 +5,10 @@ write_ikun_results <- function(result,
                                save_models = FALSE,
                                plot_formats = c("pdf", "tiff"),
                                tiff_res = 300,
-                               folder_names = NULL) {
+                               folder_names = NULL,
+                               write_report = TRUE,
+                               report_file = "IKUNML_report.html",
+                               write_excel_report = FALSE) {
   if (!inherits(result, "ikunml_result")) {
     stop("result must be produced by run_feature_selection().", call. = FALSE)
   }
@@ -117,12 +120,32 @@ write_ikun_results <- function(result,
     )
   }
 
+  .write_run_metadata(result, output_dir)
+  .write_method_parameters(result, output_dir)
+
   if (write_plots) {
     write_ikun_plots(
       result,
       output_dir = output_dir,
       formats = plot_formats,
       tiff_res = tiff_res,
+      folder_names = folder_names
+    )
+  }
+
+  if (write_report) {
+    write_ikun_report(
+      result,
+      output_dir = output_dir,
+      file = report_file,
+      folder_names = folder_names
+    )
+  }
+
+  if (write_excel_report) {
+    write_ikun_excel_report(
+      result,
+      output_dir = output_dir,
       folder_names = folder_names
     )
   }

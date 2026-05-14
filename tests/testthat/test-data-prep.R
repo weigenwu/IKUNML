@@ -64,3 +64,27 @@ test_that("method folder names use publication-style defaults and overrides", {
     "SVM_custom"
   )
 })
+
+test_that("config method blocks are mapped into method_params", {
+  cfg <- list(
+    lasso = list(alpha = 0.5),
+    SVM = list(tolerance = 0.02),
+    rf = list(ntree = 100)
+  )
+  params <- IKUNML:::.config_method_params(cfg, c("lasso", "SVM", "rf"))
+  expect_equal(params$lasso$alpha, 0.5)
+  expect_equal(params$SVM$tolerance, 0.02)
+  expect_equal(params$rf$ntree, 100)
+
+  alias_params <- IKUNML:::.config_method_params(
+    list(method_params = list(svm_rfe = list(k = 10))),
+    "SVM"
+  )
+  expect_equal(alias_params$SVM$k, 10)
+})
+
+test_that("binary AUC helper returns expected rank-based value", {
+  labels <- c(0, 0, 1, 1)
+  scores <- c(0.1, 0.4, 0.35, 0.8)
+  expect_equal(IKUNML:::.binary_auc(labels, scores), 0.75)
+})

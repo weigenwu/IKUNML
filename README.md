@@ -20,7 +20,8 @@ IKUNML 是一个用于组学数据机器学习特征筛选的 R 包。输入一�
 ```r
 install.packages(c(
   "glmnet", "Boruta", "e1071", "randomForest", "xgboost",
-  "caret", "gbm", "rpart", "doParallel", "UpSetR", "VennDiagram"
+  "caret", "gbm", "rpart", "doParallel", "UpSetR", "VennDiagram",
+  "yaml", "openxlsx"
 ))
 ```
 
@@ -73,6 +74,9 @@ res <- run_feature_selection(
 - `feature_hit_summary.csv`
 - `common_features.txt`
 - `method_runtime.csv`
+- `run_metadata.csv`
+- `method_parameters.csv`
+- `IKUNML_report.html`
 
 ## 进度和耗时
 
@@ -191,6 +195,164 @@ hit_table <- feature_hit_summary(res)
 
 feature_intersection(res, min_hits = 4)
 ```
+
+## 一键报告
+
+默认会生成 HTML 报告：
+
+```r
+write_ikun_report(res, output_dir = "IKUNML_results")
+```
+
+如果安装了 `openxlsx`，也可以生成 Excel 工作簿：
+
+```r
+write_ikun_excel_report(res, output_dir = "IKUNML_results")
+```
+
+如果希望 `run_feature_selection()` 跑完就同时生成 Excel：
+
+```r
+res <- run_feature_selection(
+  data,
+  methods = c("lasso", "SVM", "rf"),
+  write_excel_report = TRUE
+)
+```
+
+## YAML 配置文件运行
+
+可以把参数写进 `config.yml`：
+
+```yaml
+data_path: data.csv
+row_names: 1
+group_col: group
+methods: [lasso, SVM, rf, xgboost]
+output_dir: IKUNML_results
+write_report: true
+write_excel_report: true
+
+lasso:
+  alpha: 0.5
+  lambda_choice: lambda.min
+
+SVM:
+  k: 10
+  halve_above: 50
+  max_features: 200
+  tolerance: 0.02
+
+rf:
+  ntree: 5000
+  cv_ntree: 500
+  tolerance: 0.02
+```
+
+然后运行：
+
+```r
+res <- run_feature_selection_config("config.yml")
+```
+
+## 稳定性筛选
+
+为了降低随机种子和抽样波动的影响，可以重复抽样多次，统计每个特征被选中的频率：
+
+```r
+stab <- stability_selection(
+  data,
+  group_col = "group",
+  methods = c("lasso", "SVM", "rf"),
+  n_iter = 100,
+  sample_fraction = 0.8,
+  min_frequency = 0.6,
+  parallel = TRUE,
+  cores = 8,
+  output_dir = "IKUNML_stability"
+)
+```
+
+主要输出：
+
+- `stability_summary.csv`
+- `*_stable_features.txt`
+- `stability_result.rds`
+
+## 筛选后模型验证
+
+用筛选出的特征建模并输出 ROC/AUC、混淆矩阵和预测结果：
+
+```r
+val <- validate_selected_features(
+  data,
+  result = res,
+  min_hits = 3,
+  group_col = "group",
+  model = "glm",
+  train_fraction = 0.7,
+  output_dir = "IKUNML_validation"
+)
+```
+
+也可以传外部验证集：
+
+```r
+val <- validate_selected_features(
+  train_data,
+  result = res,
+  min_hits = 3,
+  test_data = external_data,
+  group_col = "group",
+  model = "randomForest",
+  output_dir = "IKUNML_external_validation"
+)
+```
+
+## 嵌套交叉验证
+
+如果要减少信息泄露，可以让每个外层 fold 都只在训练集内部做特征筛选，再用测试 fold 评估模型：
+
+```r
+ncv <- nested_cv_feature_selection(
+  data,
+  group_col = "group",
+  methods = c("lasso", "SVM", "rf"),
+  min_hits = 2,
+  model = "glm",
+  outer_folds = 5,
+  parallel = TRUE,
+  cores = 5,
+  output_dir = "IKUNML_nested_cv"
+)
+```
+
+主要输出：
+
+- `nested_cv_summary.csv`
+- `nested_cv_fold_metrics.csv`
+- `nested_cv_features_by_fold.csv`
+
+## 并行和日志
+
+耗时任务支持并行：
+
+```r
+stability_selection(data, parallel = TRUE, cores = 8)
+nested_cv_feature_selection(data, parallel = TRUE, cores = 5)
+run_ga(data, parallel = TRUE, cores = 8)
+```
+
+每次运行会记录：
+
+- `method_runtime.csv`
+- `run_metadata.csv`
+- `method_parameters.csv`
+- `method_errors.csv`（如果有失败方法）
+
+## 自动检查
+
+仓库已加入 GitHub Actions：每次 push 或 pull request 会自动运行 `R CMD check`。
 
 ## UpSet 和 Venn
 

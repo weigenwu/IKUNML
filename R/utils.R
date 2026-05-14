@@ -120,6 +120,28 @@ available_methods <- function() {
   lapply(folds, sort)
 }
 
+.stratified_sample_indices <- function(y, fraction = 0.8, seed = NULL) {
+  y <- factor(y)
+  .set_seed(seed)
+  idx <- unlist(lapply(split(seq_along(y), y), function(class_idx) {
+    n_take <- max(1L, floor(length(class_idx) * fraction))
+    sample(class_idx, n_take)
+  }), use.names = FALSE)
+  sort(idx)
+}
+
+.parallel_lapply <- function(X, FUN, parallel = FALSE, cores = NULL, ...) {
+  if (!isTRUE(parallel) || length(X) <= 1L) {
+    return(lapply(X, FUN, ...))
+  }
+  cores <- cores %||% max(1L, parallel::detectCores() - 1L)
+  cores <- min(as.integer(cores), length(X))
+  cl <- parallel::makeCluster(cores)
+  on.exit(parallel::stopCluster(cl), add = TRUE)
+  parallel::clusterEvalQ(cl, suppressPackageStartupMessages(library(IKUNML)))
+  parallel::parLapply(cl, X, FUN, ...)
+}
+
 .binary_label <- function(y, positive_class = NULL) {
   y <- factor(y)
   if (nlevels(y) != 2L) {

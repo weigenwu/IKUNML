@@ -13,7 +13,10 @@ run_feature_selection <- function(data,
                                   folder_names = NULL,
                                   progress = TRUE,
                                   continue_on_error = FALSE,
-                                  drop_na = TRUE) {
+                                  drop_na = TRUE,
+                                  write_report = TRUE,
+                                  report_file = "IKUNML_report.html",
+                                  write_excel_report = FALSE) {
   methods <- .normalize_methods(methods)
   prepared <- prepare_ikun_data(
     data = data,
@@ -160,7 +163,10 @@ run_feature_selection <- function(data,
       save_models = save_models,
       plot_formats = plot_formats,
       tiff_res = tiff_res,
-      folder_names = folder_names
+      folder_names = folder_names,
+      write_report = write_report,
+      report_file = report_file,
+      write_excel_report = write_excel_report
     )
   }
 

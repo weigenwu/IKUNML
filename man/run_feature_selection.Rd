@@ -7,7 +7,9 @@ run_feature_selection(data, group_col = "group", feature_cols = NULL,
   method_params = list(), positive_class = NULL, seed = 123,
   output_dir = "IKUNML_results", write_plots = TRUE, save_models = FALSE,
   plot_formats = c("pdf", "tiff"), tiff_res = 300, folder_names = NULL,
-  progress = TRUE, continue_on_error = FALSE, drop_na = TRUE)
+  progress = TRUE, continue_on_error = FALSE, drop_na = TRUE,
+  write_report = TRUE, report_file = "IKUNML_report.html",
+  write_excel_report = FALSE)
 }
 \arguments{
 \item{data}{Input data frame.}
@@ -31,6 +33,9 @@ the older multiple SVM-RFE style workflow. Additional methods include
 \item{progress}{Whether to print method start, finish, and elapsed-time messages.}
 \item{continue_on_error}{If \code{TRUE}, failed methods are recorded and later methods continue.}
 \item{drop_na}{Whether to remove incomplete samples.}
+\item{write_report}{Whether to write an HTML summary report when \code{output_dir} is set.}
+\item{report_file}{HTML report file name or path.}
+\item{write_excel_report}{Whether to write an Excel workbook summary. Requires \pkg{openxlsx}.}
 }
 \value{
 An \code{ikunml_result} object.
