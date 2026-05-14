@@ -7,7 +7,7 @@ IKUNML 是一个用于组学数据机器学习特征筛选的 R 包。输入一�
 - `lasso`: 基于 `glmnet`，默认 `alpha = 1`
 - `elastic_net`: 基于 `glmnet`，默认 `alpha = 0.5`
 - `boruta`: Boruta 随机森林重要性筛选
-- `svm_rfe`: 使用旧 `msvmRFE.R` 风格的 multiple SVM-RFE
+- `SVM`: 使用旧 `msvmRFE.R` 风格的 multiple SVM-RFE
 - `rf`: 随机森林重要性排序 + 交叉验证筛选变量数
 - `caret_rfe`: `caret` 通用 RFE 框架，默认随机森林 RFE
 - `gbm`: 传统梯度提升树重要性排序 + 交叉验证筛选变量数
@@ -41,12 +41,12 @@ data <- read.csv("data.csv", row.names = 1, check.names = FALSE)
 res <- run_feature_selection(
   data = data,
   group_col = "group",
-  methods = c("lasso", "boruta", "svm_rfe", "rf", "xgboost"),
+  methods = c("lasso", "boruta", "SVM", "rf", "xgboost"),
   output_dir = "IKUNML_results",
   method_params = list(
     lasso = list(alpha = 1, lambda_choice = "lambda.min"),
     boruta = list(ntree = 5000, maxRuns = 100, pValue = 0.001),
-    svm_rfe = list(k = 10, halve_above = 50, max_features = 200, tolerance = 0.02),
+    SVM = list(k = 10, halve_above = 50, max_features = 200, tolerance = 0.02),
     rf = list(ntree = 5000, cv_ntree = 500, max_features = 200, tolerance = 0.02),
     xgboost = list(nrounds = 500, cv_nrounds = 100, max_features = 200, tolerance = 0.02)
   )
@@ -132,9 +132,9 @@ SVM、RF、XGBoost、GBM、rpart 都支持 `tolerance`。
 res <- run_feature_selection(
   data,
   group_col = "group",
-  methods = c("svm_rfe", "rf", "xgboost"),
+  methods = c("SVM", "rf", "xgboost"),
   method_params = list(
-    svm_rfe = list(tolerance = 0.02, prefer = "largest"),
+    SVM = list(tolerance = 0.02, prefer = "largest"),
     rf = list(tolerance = 0.02, prefer = "largest"),
     xgboost = list(tolerance = 0.02, prefer = "largest")
   )
@@ -143,11 +143,11 @@ res <- run_feature_selection(
 
 ## SVM-RFE
 
-现在只有一个 SVM 入口：`svm_rfe`。它内部使用贴近你旧 `msvmRFE.R` 的流程，包括 `k`、`halve_above`、fold-specific ranking 和特征数量 sweep。
+现在只有一个 SVM 方法名：`SVM`。它内部使用贴近你旧 `msvmRFE.R` 的流程，包括 `k`、`halve_above`、fold-specific ranking 和特征数量 sweep。
 旧脚本中的 `halve.above` 也可以继续传入；`cost` 和 `scale` 会被映射到新的 SVM-RFE 排名/性能评估参数。
 
 ```r
-svm_res <- run_svm_rfe(
+svm_res <- run_SVM(
   data,
   group_col = "group",
   k = 10,
@@ -161,7 +161,7 @@ svm_res <- run_svm_rfe(
 )
 ```
 
-旧别名 `msvm_rfe`、`msvmrfe` 仍可输入，但都会自动映射到 `svm_rfe`，不会再产生两个 SVM 方法。
+旧别名 `svm_rfe`、`msvm_rfe`、`msvmrfe` 仍可输入，但都会自动映射到 `SVM`，不会再产生两个 SVM 方法。
 
 ## 图片格式
 

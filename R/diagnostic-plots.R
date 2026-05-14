@@ -124,7 +124,7 @@
 .plot_svm_diagnostics <- function(method_result, method_dir, top_n) {
   if (!is.null(method_result$cv_metrics)) {
     .write_pdf_plot(
-      file.path(method_dir, "svm_rfe_accuracy.pdf"),
+      file.path(method_dir, "SVM_accuracy.pdf"),
       7,
       5,
       function() {
@@ -135,7 +135,7 @@
       }
     )
     .write_pdf_plot(
-      file.path(method_dir, "svm_rfe_error.pdf"),
+      file.path(method_dir, "SVM_error.pdf"),
       7,
       5,
       function() .plot_metric_curve(
@@ -151,7 +151,7 @@
     ranking <- method_result$ranking
     ranking$score <- max(ranking$rank, na.rm = TRUE) - ranking$rank + 1
     .write_pdf_plot(
-      file.path(method_dir, "svm_rfe_top_features.pdf"),
+      file.path(method_dir, "SVM_top_features.pdf"),
       9,
       7,
       function() .plot_top_bar(
@@ -333,7 +333,7 @@ write_ikun_plots <- function(result,
       .plot_lasso_diagnostics(method_result, method_dir)
     } else if (identical(method, "boruta")) {
       .plot_boruta_diagnostics(method_result, method_dir)
-    } else if (identical(method, "svm_rfe")) {
+    } else if (identical(method, "SVM")) {
       .plot_svm_diagnostics(method_result, method_dir, top_n = top_n)
     } else if (identical(method, "rf")) {
       .plot_rf_diagnostics(method_result, method_dir, top_n = top_n)

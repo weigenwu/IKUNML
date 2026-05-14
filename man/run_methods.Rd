@@ -2,6 +2,7 @@
 \alias{run_lasso}
 \alias{run_elastic_net}
 \alias{run_boruta}
+\alias{run_SVM}
 \alias{run_svm_rfe}
 \alias{run_rf}
 \alias{run_caret_rfe}
@@ -16,6 +17,8 @@ run_lasso(data, group_col = "group", feature_cols = NULL, ...)
 run_elastic_net(data, group_col = "group", feature_cols = NULL, ...)
 
 run_boruta(data, group_col = "group", feature_cols = NULL, ...)
+
+run_SVM(...)
 
 run_svm_rfe(data, group_col = "group", feature_cols = NULL, ...)
 
@@ -50,7 +53,7 @@ you want full control over one algorithm before combining results manually.
 is LASSO, \code{alpha = 0} is ridge, and values between 0 and 1 are elastic net.
 \code{run_elastic_net()} is a convenience wrapper around \code{run_lasso()} with
 default \code{alpha = 0.5}. \code{run_boruta()} uses \pkg{Boruta}.
-\code{run_svm_rfe()} implements the older multiple SVM-RFE workflow with
+\code{run_SVM()} and the backward-compatible \code{run_svm_rfe()} implement the older multiple SVM-RFE workflow with
 fold-specific rankings, \code{k} internal ranking folds, \code{halve_above}
 feature halving, and an optional tuned SVM feature-count sweep.
 For easier migration from older scripts, \code{halve.above}, \code{cost}, and

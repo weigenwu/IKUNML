@@ -16,7 +16,7 @@ run_feature_selection(data, group_col = "group", feature_cols = NULL,
 \item{methods}{Methods to run. Use \code{"all"} to request every supported method.
 Use \code{"lasso"} for the default \code{alpha = 1} \pkg{glmnet} model,
 \code{"elastic_net"} for the same backend with default \code{alpha = 0.5}, and
-\code{"ga"} for genetic algorithm feature selection. \code{"svm_rfe"} uses
+\code{"ga"} for genetic algorithm feature selection. \code{"SVM"} uses
 the older multiple SVM-RFE style workflow. Additional methods include
 \code{"caret_rfe"}, \code{"gbm"}, and \code{"rpart"}.}
 \item{method_params}{Named list of method-specific parameter lists.}
@@ -69,9 +69,9 @@ enet_ga <- run_feature_selection(
 svm <- run_feature_selection(
   data,
   group_col = "group",
-  methods = "svm_rfe",
+  methods = "SVM",
   method_params = list(
-    svm_rfe = list(k = 10, halve_above = 50, max_features = 200, tolerance = 0.02)
+    SVM = list(k = 10, halve_above = 50, max_features = 200, tolerance = 0.02)
   )
 )
 

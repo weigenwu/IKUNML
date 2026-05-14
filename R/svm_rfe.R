@@ -67,9 +67,13 @@ run_svm_rfe <- function(data,
         performance_gamma = performance_gamma,
         verbose = verbose,
         drop_na = drop_na,
-        method_name = "svm_rfe"
+        method_name = "SVM"
       ),
       extra_args
     )
   )
+}
+
+run_SVM <- function(...) {
+  run_svm_rfe(...)
 }
