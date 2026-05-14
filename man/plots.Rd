@@ -16,6 +16,7 @@ write_ikun_plots(result, output_dir = "IKUNML_results", methods = NULL,
 }
 \arguments{
 \item{result}{An \code{ikunml_result} object.}
+\item{output_dir}{Directory where method diagnostic plots are written.}
 \item{methods}{Optional methods to include.}
 \item{file}{Optional PDF file path.}
 \item{width}{PDF width.}

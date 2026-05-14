@@ -3,6 +3,8 @@ Title: Configurable Machine Learning Feature Selection for Omics Data
 Version: 0.1.0
 Authors@R: 
     person("Weigen", "Wu", email = "weigenwu@example.com", role = c("aut", "cre"))
+Author: Weigen Wu
+Maintainer: Weigen Wu <weigenwu@example.com>
 Description: A lightweight toolkit for configurable feature selection in
     transcriptomic and other omics-style classification data. IKUNML wraps
     LASSO/elastic net, Boruta, SVM-RFE, random forest, gradient boosting,

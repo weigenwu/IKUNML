@@ -1,3 +1,3 @@
 .onAttach <- function(libname, pkgname) {
-  packageStartupMessage("别感冒")
+  packageStartupMessage("\u522b\u611f\u5192")
 }
